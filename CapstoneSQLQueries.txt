@@ -1,0 +1,87 @@
+WITH CTE(ride_id, rideable_type, started_at, ended_at, start_station_name, start_station_id, 
+		end_station_name, end_station_id, start_lat, start_lng, end_lat, end_lng, member_casual, weekday)
+AS
+(
+		SELECT * FROM [202306]
+		UNION
+		SELECT * FROM [202307]
+		UNION
+		SELECT * FROM [202308]
+		UNION
+		SELECT * FROM [202309]
+		UNION
+		SELECT * FROM [202310]
+		UNION
+		SELECT * FROM [202311]
+		UNION
+		SELECT * FROM [202312]
+		UNION
+		SELECT * FROM [202401]
+		UNION
+		SELECT * FROM [202402]
+		UNION
+		SELECT * FROM [202403]
+		UNION
+		SELECT * FROM [202404]
+		UNION
+		SELECT * FROM [202405]
+)
+
+--SELECT top(100) * FROM CTE
+
+--Shows the popularity of stations between members and casuals.
+/*SELECT start_station_name, member_casual, ROUND(AVG(start_lng), 5) as long, ROUND(AVG(start_lat), 5) as lat, count(*) as ride_count
+FROM CTE 
+GROUP BY start_station_name, member_casual
+ORDER BY ride_count desc*/
+
+--Shows the most popular bike type between members and casuals.
+/*SELECT rideable_type as bike_type, member_casual, count(*) as ride_count, count(*) * 100.0/ sum(count(*)) over () as percents
+FROM CTE 
+GROUP BY rideable_type, member_casual
+ORDER BY ride_count desc*/
+
+--Shows the day of the week members and casuals frequently ride on.
+/*SELECT 
+CASE WHEN weekday = 1 THEN 'Sunday'
+WHEN weekday = 2 THEN 'Monday'
+WHEN weekday = 3 THEN 'Tuesday'
+WHEN weekday = 4 THEN 'Wednesday'
+WHEN weekday = 5 THEN 'Thursday'
+WHEN weekday = 6 THEN 'Friday'
+ELSE 'Saturday' END AS day_of_week
+, member_casual, count(*) as ride_count, count(*) * 100.0/ sum(count(*)) over () as percents
+FROM CTE 
+GROUP BY weekday, member_casual
+ORDER BY weekday asc*/
+
+--Shows the average length of time a member or casual rides based on the day of the week.
+/*SElECT 
+CASE WHEN weekday = 1 THEN 'Sunday'
+WHEN weekday = 2 THEN 'Monday'
+WHEN weekday = 3 THEN 'Tuesday'
+WHEN weekday = 4 THEN 'Wednesday'
+WHEN weekday = 5 THEN 'Thursday'
+WHEN weekday = 6 THEN 'Friday'
+ELSE 'Saturday' END AS day_of_week
+, member_casual, AVG(DATEDIFF(minute, started_at, ended_at)) as average_ride_length
+FROM CTE 
+GROUP BY weekday, member_casual
+ORDER BY weekday asc*/
+
+--Shows the amount of rides based on hour for casuals and members.
+/*SELECT DATEPART(hour, started_at) AS hour_of_day, member_casual, COUNT(*) AS ride_count
+FROM CTE
+GROUP BY DATEPART(hour, started_at), member_casual
+ORDER BY hour_of_day, member_casual*/
+
+--Shows the amount of rides based on month for casuals and members.
+/*SELECT DATENAME(month, started_at) AS hour_of_day, member_casual, COUNT(*) AS ride_count
+FROM CTE
+GROUP BY DATENAME(month, started_at), member_casual
+ORDER BY hour_of_day, member_casual*/
+
+SElECT member_casual, AVG(DATEDIFF(minute, started_at, ended_at)) as average_ride_length
+FROM CTE 
+GROUP BY member_casual
+
